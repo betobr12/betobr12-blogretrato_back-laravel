@@ -12,9 +12,9 @@ class PostController extends Controller
         return Post::all();
     }
 
-    public function store(Request $request) {
-        $post = new Post();
-        
+    public function store(Request $request) 
+    {
+        $post = new Post();        
         $path = $request->file('arquivo')->store('imagens', 'public');
 
         $post->nome      = $request->nome;
@@ -24,28 +24,31 @@ class PostController extends Controller
         $post->mensagem  = $request->mensagem;
         $post->arquivo   = $path;
         $post->likes     = 0;
-        $post->save();
-        
-        return response($post, 200);
+        if ($post->save()) {
+            return response($post, 200);
+        }
+        return response('Erro ao inseri -lo', 400);
     }
 
-    public function destroy($id) {
+    public function destroy($id) 
+    {
         $post = Post::find($id);
         if (isset($post)) {
             Storage::disk('public')->delete($post->arquivo);
             $post->delete();
             return 204;
         }
-        return response('Post nao encontrado', 404);
+        return response('Post não localizado', 404);
     }
 
-    public function like($id) {
+    public function like($id) 
+    {
         $post = Post::find($id);
         if (isset($post)) {
             $post->likes++;
             $post->save();
             return $post;
         }
-        return response('ID nao encontrado', 404);
+        return response('ID nãoo encontrado', 404);
     }
 }
